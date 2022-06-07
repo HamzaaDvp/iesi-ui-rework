@@ -1,25 +1,26 @@
-import { SWRConfiguration, Revalidator } from 'swr'
-import axios from "axios";
-import {requestWrapper} from "@app/lib/requestWrapper";
+import {SWRConfiguration} from 'swr'
+import {authenticatedClient, internalClient} from "@app/lib/requestWrapper";
+import API_ROUTES from "@app/constants/api/routes";
 
 export const swrConfig: SWRConfiguration = {
-    fetcher: requestWrapper,
-    onErrorRetry
-}
-
-
-async function onErrorRetry(error: any, key: string, config: SWRConfiguration, revalidate: Revalidator) {
-    if (
-        error.response.data.error === 'invalid_token' &&
-        error.response.data.error_description.includes('expired')
-    ) {
-        const sessionTokenRes = await axios.get("/api/token");
-        await axios.post(`/api/login?${new URLSearchParams({
-            grant_type: 'refresh_token',
-            client_id: 'iesi',
-            client_secret: 'iesi',
-            refresh_token: sessionTokenRes.data.refresh_token
-        })}`)
-        revalidate();
+    fetcher: authenticatedClient,
+    onErrorRetry: async (err, key, config, revalidate) => {
+        if (
+            err.response.data.error === 'invalid_token' &&
+            err.response.data.error_description.includes('expired')
+        ) {
+            const sessionTokenRes = await internalClient.get("/api/token");
+            await internalClient.post(API_ROUTES.auth_routes.login({
+                grant_type: 'refresh_token',
+                client_id: 'iesi',
+                client_secret: 'iesi',
+                refresh_token: sessionTokenRes.data.refresh_token
+            }))
+            revalidate();
+        }
+        return;
     }
 }
+
+
+

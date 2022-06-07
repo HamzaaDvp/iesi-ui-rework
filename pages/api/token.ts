@@ -1,6 +1,5 @@
 // pages/api/user.ts
 
-import { withIronSessionApiRoute } from "iron-session/next";
 import {NextApiRequest, NextApiResponse} from "next";
 import {withSessionRoute} from "@app/lib/withSession";
 
