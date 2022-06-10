@@ -1,5 +1,6 @@
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from "axios";
-import { ICustomAxiosRequestConfig } from "@app/types/axios";
+import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
+import {EconnRefusedError, ExpiredTokenError, InvalidTokenError} from "@app/throwables/auth";
+
 
 const axiosConfig: AxiosRequestConfig = {
     baseURL: 'http://localhost:8080/api',
@@ -20,18 +21,28 @@ async function onFulfilledRequest(request: AxiosRequestConfig) {
 }
 
 async function onRejectedRequest(error: any) {
-    console.log('ERROR: ', error)
-    if (typeof window !== 'undefined' && error) {
+    if (error) {
         if (error.code === 'ECONNREFUSED') {
-            window.location.href = '/500?message=The server seems to not responding'
-            return;
+            if (typeof window === 'undefined') {
+                throw new EconnRefusedError("The server seems to not responding");
+            } else {
+                window.location.href = '/500?message=The server seems to not responding'
+                return;
+            }
         } else if (error.response.data.error === 'invalid_token' && !error.response.data.error_description.includes('expired')) {
-            window.location.href = '/login?' + new URLSearchParams({
-                callbackUrl: window.location.pathname
-            })
+            if (typeof window === 'undefined') {
+                throw new InvalidTokenError("Access token is invalid")
+            } else {
+                window.location.href = '/login?' + new URLSearchParams({
+                    callbackUrl: window.location.pathname
+                })
+            }
+        } else if (error.response.data.error === 'invalid_token' && error.response.data.error_description.includes('expired')) {
+            throw new ExpiredTokenError("The token has expired")
         }
     }
-    throw error
+
+    throw error;
 }
 
 authenticatedClient.interceptors.request.use(onFulfilledRequest);
