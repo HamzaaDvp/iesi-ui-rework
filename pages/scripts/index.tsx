@@ -4,6 +4,7 @@ import {withSessionSsr} from "@app/lib/withSession";
 import API_ROUTES from "@app/constants/api/routes";
 import useSWR from 'swr'
 import {EconnRefusedError, ExpiredTokenError, InvalidTokenError} from "@app/throwables/auth";
+import Head from "next/head";
 
 export default function ScriptsOverview() {
     const data = useSWR('/scripts')
@@ -14,7 +15,12 @@ export default function ScriptsOverview() {
 
 
     return (
-        <p>Script overview</p>
+        <>
+            <Head>
+                <title>Scripts overview</title>
+            </Head>
+            <p>Script overview</p>
+        </>
     )
 }
 
@@ -60,7 +66,7 @@ async function sendRequest(req: any, resolvedUrl: string) {
 
         return {
             redirect: {
-                permanent: true,
+                permanent: false,
                 destination,
             }
         }

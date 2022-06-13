@@ -1,9 +1,10 @@
 import axios from "axios";
 import {useRouter} from "next/router";
 import {internalClient} from "@app/lib/requestWrapper";
+import Head from "next/head";
 
 export default function Login() {
-    const { query, push } = useRouter();
+    const router = useRouter();
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
@@ -15,7 +16,7 @@ export default function Login() {
                 password: 'admin',
             } as any))
 
-            push(query.callbackUrl as string);
+            router.push(router.query.callbackUrl as string);
 
         } catch (err) {
 
@@ -23,15 +24,20 @@ export default function Login() {
     }
 
     return (
-        <form onSubmit={onSubmit}>
-            <input
-                type="text"
-                placeholder="Jane Doe"
-            />
-            <input
-                type="password"
-            />
-            <button type="submit">Log in</button>
-        </form>
+        <>
+            <Head>
+                <title>IESI login page</title>
+            </Head>
+            <form onSubmit={onSubmit}>
+                <input
+                    type="text"
+                    placeholder="Jane Doe"
+                />
+                <input
+                    type="password"
+                />
+                <button type="submit">Log in</button>
+            </form>
+        </>
     )
 }
