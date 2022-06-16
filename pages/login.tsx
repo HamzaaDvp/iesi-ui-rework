@@ -22,7 +22,7 @@ export default function Login() {
                 client_id: 'iesi',
                 client_secret: 'iesi',
                 username: usernameRef.current?.value,
-                password: usernameRef.current?.value,
+                password: passwordRef.current?.value,
             } as any))
             setIsLogging(false)
 

@@ -1,5 +1,5 @@
 import {unauthenticatedClient} from "@app/lib/requestWrapper";
-import {GetServerSideProps} from "next";
+import {GetServerSideProps, GetServerSidePropsResult} from "next";
 import {withSessionSsr} from "@app/lib/withSession";
 import API_ROUTES from "@app/constants/api/routes";
 import useSWR from 'swr'
@@ -24,20 +24,18 @@ export default function ScriptsOverview() {
     )
 }
 
-async function sendRequest(req: any, resolvedUrl: string) {
+async function sendRequest(req: any, resolvedUrl: string): Promise<GetServerSidePropsResult<any>> {
     try {
         await unauthenticatedClient.get(API_ROUTES.auth_routes.check_token({
             token: req.session.access_token
         }))
     } catch (err: any) {
         console.log(err)
-        let destination;
+        let destination = '/login?' + new URLSearchParams({
+            callbackUrl: resolvedUrl
+        });
         if (err instanceof EconnRefusedError) {
             destination = '/500?message=The server seems to not responding'
-        } else if (err instanceof InvalidTokenError) {
-            destination = '/login?' + new URLSearchParams({
-                callbackUrl: resolvedUrl
-            })
         } else if (err instanceof ExpiredTokenError) {
             try {
                 console.log('expired')
@@ -56,10 +54,6 @@ async function sendRequest(req: any, resolvedUrl: string) {
             } catch (error) {
                 if (error instanceof EconnRefusedError) {
                     destination = '/500?message=The server seems to not responding'
-                } else if (error instanceof InvalidTokenError) {
-                    destination = '/login?' + new URLSearchParams({
-                        callbackUrl: resolvedUrl
-                    })
                 }
             }
         }
