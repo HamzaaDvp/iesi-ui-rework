@@ -15,22 +15,22 @@ export default function Login() {
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setIsLogging(true)
         try {
-            setIsLogging(true)
             await internalClient.post(`/api/login?` + new URLSearchParams({
                 grant_type: 'password',
                 client_id: 'iesi',
                 client_secret: 'iesi',
                 username: usernameRef.current?.value,
-                password: usernameRef.current?.value,
-            } as any))
-            setIsLogging(false)
-
-            router.push(router.query.callbackUrl as string);
-
-        } catch (err) {
-
+                password: passwordRef.current?.value,
+            } as any));
+            await router.push(router.query.callbackUrl as string);
+        } catch (e) {
+            console.log('cc')
         }
+        setIsLogging(false)
+
+
     }
 
     return (
@@ -43,12 +43,15 @@ export default function Login() {
                 <TextField
                     label="Username"
                     variant="filled"
+                    id="login-form-username"
                     inputRef={usernameRef}
                     fullWidth
                     />
                 <TextField
                     label="Password"
+                    type="password"
                     variant="filled"
+                    id="login-form-password"
                     inputRef={passwordRef}
                     fullWidth
                     />

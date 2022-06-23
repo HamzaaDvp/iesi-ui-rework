@@ -1,6 +1,6 @@
 import axios, {AxiosInstance, AxiosRequestConfig} from "axios";
 import {EconnRefusedError, ExpiredTokenError, InvalidTokenError} from "@app/throwables/auth";
-
+import snackbarUtil from '@app/lib/snackbar'
 
 const axiosConfig: AxiosRequestConfig = {
     baseURL: 'http://localhost:8080/api',
@@ -40,15 +40,43 @@ async function onRejectedRequest(error: any) {
         } else if (error.response.data.error === 'invalid_token' && error.response.data.error_description.includes('expired')) {
             throw new ExpiredTokenError("The token has expired")
         }
+
+        snackbarUtil.error('Error')
     }
 
     throw error;
 }
 
 authenticatedClient.interceptors.request.use(onFulfilledRequest);
-authenticatedClient.interceptors.response.use((response) => response, onRejectedRequest)
-unauthenticatedClient.interceptors.response.use((response) => response, onRejectedRequest)
-internalClient.interceptors.response.use((response) => response, onRejectedRequest)
+
+authenticatedClient.interceptors.response.use((response) => {
+    if (typeof window !== 'undefined' && response.config.method !== 'get') {
+        snackbarUtil.success("Authenticated client")
+    }
+    return response;
+}, onRejectedRequest)
+
+unauthenticatedClient.interceptors.response.use((response) => {
+    if (
+        typeof window !== 'undefined' &&
+        response.config.method !== 'get' &&
+        !response.config.url?.includes('grant_type=refresh_token')
+    ) {
+        snackbarUtil.success("Unauthenticated client")
+    }
+    return response;
+}, onRejectedRequest)
+
+internalClient.interceptors.response.use((response) => {
+    if (
+        typeof window !== 'undefined' &&
+        response.config.method !== 'get' &&
+        !response.config.url?.includes('grant_type=refresh_token')
+    ) {
+        snackbarUtil.success("Internal client")
+    }
+    return response;
+}, onRejectedRequest)
 
 export { authenticatedClient, unauthenticatedClient, internalClient  }
 
