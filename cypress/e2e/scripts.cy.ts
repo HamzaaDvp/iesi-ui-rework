@@ -3,7 +3,9 @@ describe('Scripts spec', () => {
 
   it('With no access token, should access to Scripts overview after logged in', () => {
     cy.visit('http://localhost:3000/scripts')
-    cy.intercept('http://localhost:3000/api/*').as('login')
+    cy.intercept('POST', '/api/login*').as('login');
+    cy.get('input[id="login-form-username"').type("admin")
+    cy.get('input[id="login-form-password"').type("admin")
     cy.get('form').submit()
     cy.wait('@login')
     cy.getCookie('next-auth-session').should('exist')
@@ -25,13 +27,14 @@ describe('Scripts spec', () => {
   it('With an expired token, should stay on the Scripts overview page', () => {
     cy.visit('http://localhost:3000/scripts')
     cy.intercept('http://localhost:3000/api/*').as('login')
+    cy.get('input[id="login-form-username"').type("admin")
+    cy.get('input[id="login-form-password"').type("admin")
     cy.get('form').submit()
     cy.wait('@login')
     cy.getCookie('next-auth-session').should('exist')
     cy.visit('http://localhost:3000/scripts')
     cy.get('head > title').should('contain', 'Scripts overview')
     cy.getCookie('next-auth-session').then(c => token = c?.value);
-    cy.wait(15000)
     cy.get('head > title').should('contain', 'Scripts overview')
   })
 

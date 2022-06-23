@@ -30,17 +30,13 @@ async function sendRequest(req: any, resolvedUrl: string) {
             token: req.session.access_token
         }))
     } catch (err: any) {
-        console.log(err)
-        let destination;
+        let destination = '/login?' + new URLSearchParams({
+            callbackUrl: resolvedUrl
+        });
         if (err instanceof EconnRefusedError) {
             destination = '/500?message=The server seems to not responding'
-        } else if (err instanceof InvalidTokenError) {
-            destination = '/login?' + new URLSearchParams({
-                callbackUrl: resolvedUrl
-            })
         } else if (err instanceof ExpiredTokenError) {
             try {
-                console.log('expired')
                 const tokenRes = await unauthenticatedClient.post(`oauth/token?${new URLSearchParams({
                     client_id: 'iesi',
                     client_secret: 'iesi',
@@ -56,10 +52,6 @@ async function sendRequest(req: any, resolvedUrl: string) {
             } catch (error) {
                 if (error instanceof EconnRefusedError) {
                     destination = '/500?message=The server seems to not responding'
-                } else if (error instanceof InvalidTokenError) {
-                    destination = '/login?' + new URLSearchParams({
-                        callbackUrl: resolvedUrl
-                    })
                 }
             }
         }
