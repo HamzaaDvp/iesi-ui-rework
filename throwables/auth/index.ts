@@ -1,24 +1,4 @@
-export class AxiosError {
-    private message:string;
-
-    constructor(message:string) {
-        this.message = message;
-    }
-}
-
-export class EconnRefusedError extends AxiosError {
-    constructor(message: string) {
-        super(message);
-    }
-}
-export class InvalidTokenError extends AxiosError {
-    constructor(message:string) {
-        super(message);
-    }
-}
-
-export class ExpiredTokenError extends AxiosError {
-    constructor(message:string) {
-        super(message);
-    }
-}
+// eslint-disable-next-line max-classes-per-file
+export class EconnRefusedError extends Error {}
+export class InvalidTokenError extends Error {}
+export class ExpiredTokenError extends Error {}

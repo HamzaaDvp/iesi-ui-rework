@@ -1,27 +1,28 @@
-import { useSnackbar, VariantType, WithSnackbarProps } from 'notistack'
-import React from 'react'
+import { useSnackbar, VariantType, WithSnackbarProps } from 'notistack';
+import React from 'react';
 
-let useSnackbarRef: WithSnackbarProps
+let useSnackbarRef: WithSnackbarProps;
 
+// eslint-disable-next-line react/function-component-definition
 export const SnackbarUtilsConfigurator: React.FC = () => {
-    useSnackbarRef = useSnackbar()
-    return null
-}
+  useSnackbarRef = useSnackbar();
+  return null;
+};
 
 export default {
-    success(msg: string) {
-        this.toast(msg, 'success')
-    },
-    warning(msg: string) {
-        this.toast(msg, 'warning')
-    },
-    info(msg: string) {
-        this.toast(msg, 'info')
-    },
-    error(msg: string) {
-        this.toast(msg, 'error')
-    },
-    toast(msg: string, variant: VariantType = 'default') {
-        useSnackbarRef.enqueueSnackbar(msg, { variant })
-    }
-}
+  success(msg: string) {
+    this.toast(msg, 'success');
+  },
+  warning(msg: string) {
+    this.toast(msg, 'warning');
+  },
+  info(msg: string) {
+    this.toast(msg, 'info');
+  },
+  error(msg: string) {
+    this.toast(msg, 'error');
+  },
+  toast(msg: string, variant: VariantType = 'default') {
+    useSnackbarRef.enqueueSnackbar(msg, { variant });
+  },
+};

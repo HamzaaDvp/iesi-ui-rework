@@ -1,5 +1,5 @@
-import {AxiosRequestConfig} from "axios";
+import { AxiosRequestConfig } from 'axios';
 
-export interface ICustomAxiosRequestConfig extends AxiosRequestConfig {
-    isAuthenticated?: boolean;
+export interface IAxiosErrorData extends AxiosRequestConfig {
+  isAuthenticated?: boolean;
 }
